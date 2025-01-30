@@ -1,0 +1,27 @@
+services:
+  caddy:
+    container_name: caddy
+    build:
+      context: .
+      dockerfile: ${PWD}/caddy.Dockerfile
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      # Caddyfile needs to be created before deloyment for docker to detect as file
+      - ${PWD}/Caddyfile:/etc/caddy/Caddyfile
+      - ${PWD}/site:/srv
+      - ${PWD}/caddy_data:/data
+      - ${PWD}/caddy_config:/config
+    dns:
+      - 8.8.8.8
+    networks:
+      - reverse_proxy
+
+networks:
+  reverse_proxy:
+    external: true
