@@ -1,1 +1,16 @@
+services:
+  baikal:
+    container_name: baikal
+    image: ckulka/baikal:nginx
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/config:/var/www/baikal/config
+      - ${PWD}/data:/var/www/baikal/Specific
+    networks:
+      - reverse_proxy
+    expose:
+      - "80"
 
+networks:
+  reverse_proxy:
+    external: true
