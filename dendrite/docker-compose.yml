@@ -1,0 +1,45 @@
+name: dendrite
+services:
+  postgres:
+    image: postgres:17.2
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DATABASE: dendrite
+      POSTGRES_USER: dendrite
+      POSTGRES_PASSWORD: ${YOUR_DATABASE_PASSWORD}
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dendrite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dendrite
+
+  dendrite:
+    restart: unless-stopped
+    image: matrixdotorg/dendrite-monolith:latest
+    volumes:
+      - ${PWD}/config:/etc/dendrite
+      - ${PWD}/media:/var/dendrite/media
+      - ${PWD}/jetstream:/var/dendrite/jetstream
+      - ${PWD}/searchindex:/var/dendrite/searchindex
+    expose:
+      - "8008"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    dns:
+      - 8.8.8.8
+    networks:
+      - dendrite
+      - reverse_proxy
+
+networks:
+  reverse_proxy:
+    external: true
+  dendrite:
+    driver: bridge
