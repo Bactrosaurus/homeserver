@@ -1,0 +1,27 @@
+services:
+  frigate:
+    container_name: frigate
+    image: ghcr.io/blakeblackshear/frigate:stable
+    privileged: true
+    restart: unless-stopped
+    shm_size: "128mb"
+    devices:
+      - /dev/apex_0:/dev/apex_0
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    volumes:
+      - ${PWD}/media:/media/frigate
+      - ${PWD}/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8554:8554" # RTSP feeds
+      - "3001:8971"
+      - "1984:1984" # go2rtc web interface
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    environment:
+      FRIGATE_RTSP_USER: "USER"
+      FRIGATE_RTSP_PASSWORD: "PASSWORD"
