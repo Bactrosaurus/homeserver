@@ -1,0 +1,61 @@
+mqtt:
+  enabled: false
+
+tls:
+  enabled: false
+
+detectors:
+  coral:
+    type: edgetpu
+    device: pci:0
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+ui:
+  timezone: Europe/Berlin
+  time_format: 24hour
+
+review:
+  alerts:
+    labels:
+      - person
+
+snapshots:
+  enabled: true
+  retain:
+    default: 30
+  quality: 100
+
+record:
+  enabled: true
+  events:
+    retain:
+      default: 30
+      mode: motion
+
+go2rtc:
+  streams:
+    hinten:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{CAM_IP}/cam/realmonitor?channel=1&subtype=00
+      
+cameras:
+  hinten:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{CAM_IP}/cam/realmonitor?channel=1&subtype=00
+          roles:
+            - record
+            - detect
+    objects:
+      track:
+        - person
+        - bicycle
+        - cat
+        - dog
+    motion:
+      mask: 1,0,1,0.617,0.703,0.332,0.438,0.11,0.436,0
+
+version: 0.14
+
+camera_groups: {}
